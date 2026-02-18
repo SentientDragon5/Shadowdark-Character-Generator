@@ -1,0 +1,94 @@
+{
+  "basic_gear": [
+    {
+      "item": "Arrows (20)",
+      "cost": "1 gp",
+      "quantity_per_slot": "1-20"
+    },
+    {
+      "item": "Backpack",
+      "cost": "2 gp",
+      "quantity_per_slot": "1 (first one free to carry)"
+    },
+    {
+      "item": "Caltrops (one bag)",
+      "cost": "5 sp",
+      "quantity_per_slot": "1"
+    },
+    {
+      "item": "Coin",
+      "cost": "Varies",
+      "quantity_per_slot": "100 (first 100 free to carry)"
+    },
+    {
+      "item": "Crossbow bolts (20)",
+      "cost": "1 gp",
+      "quantity_per_slot": "1-20"
+    },
+    {
+      "item": "Crowbar",
+      "cost": "5 sp",
+      "quantity_per_slot": "1"
+    },
+    {
+      "item": "Flask or bottle",
+      "cost": "3 sp",
+      "quantity_per_slot": "1"
+    },
+    {
+      "item": "Flint and steel",
+      "cost": "5 sp",
+      "quantity_per_slot": "1"
+    },
+    {
+      "item": "Gem",
+      "cost": "Varies",
+      "quantity_per_slot": "1-10"
+    },
+    {
+      "item": "Grappling hook",
+      "cost": "1 gp",
+      "quantity_per_slot": "1"
+    },
+    {
+      "item": "Iron spikes (10)",
+      "cost": "1 gp",
+      "quantity_per_slot": "1-10"
+    },
+    {
+      "item": "Lantern",
+      "cost": "5 gp",
+      "quantity_per_slot": "1"
+    },
+    {
+      "item": "Mirror",
+      "cost": "10 gp",
+      "quantity_per_slot": "1"
+    },
+    {
+      "item": "Oil, flask",
+      "cost": "5 sp",
+      "quantity_per_slot": "1"
+    },
+    {
+      "item": "Pole",
+      "cost": "5 sp",
+      "quantity_per_slot": "1"
+    },
+    {
+      "item": "Rations (3)",
+      "cost": "5 sp",
+      "quantity_per_slot": "1-3"
+    },
+    {
+      "item": "Rope, 60'",
+      "cost": "1 gp",
+      "quantity_per_slot": "1"
+    },
+    {
+      "item": "Torch",
+      "cost": "5 sp",
+      "quantity_per_slot": "1"
+    }
+  ]
+}
