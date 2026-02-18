@@ -1,17 +1,15 @@
 import json
 import random
 import os
-import datetime
 import importlib
+import argparse
 
-# Helper Functions
+# Import the class module directly
+import classes.fighter as fighter_class
+import pdf_character
+
 def roll(n, d):
     return sum(random.randint(1, d) for _ in range(n))
-
-def roll_advantage(n, d):
-    roll1 = roll(n, d)
-    roll2 = roll(n, d)
-    return max(roll1, roll2)
 
 def get_mod(score):
     if score >= 18: return 4
@@ -32,53 +30,104 @@ def load_json(path):
         print(f"Error: Could not find {path}")
         return {}
 
-def parse_talent(roll_val, table):
-    for entry in table:
-        r = entry['roll']
-        if '-' in r:
-            low, high = map(int, r.split('-'))
-            if low <= roll_val <= high:
-                return entry['effect']
-        elif int(r) == roll_val:
-            return entry['effect']
-    return table[-1]['effect']
+def calculate_ac(character, gear_data):
+    """
+    Calculates AC based on inventory (armor/shields), DEX mod, and Talents.
+    """
+    inventory = character.get('inventory', [])
+    dex_mod = character['stats']['DEX']['modifier']
+    talents = character.get('talents', [])
+    
+    armor_lookup = {item['item']: item for item in gear_data.get('armor', [])}
+    
+    best_base_ac = 10 + dex_mod
+    bonus_ac = 0
+    
+    for item_name in inventory:
+        if item_name in armor_lookup:
+            effect = armor_lookup[item_name].get('ac_effect', '')
+            if effect.startswith("+"):
+                bonus_ac += int(effect)
+            else:
+                current_armor_ac = 0
+                if "DEX" in effect:
+                    base_val = int(effect.split('+')[0].strip())
+                    current_armor_ac = base_val + dex_mod
+                else:
+                    try:
+                        current_armor_ac = int(effect.strip())
+                    except ValueError:
+                        pass
+                if current_armor_ac > best_base_ac:
+                    best_base_ac = current_armor_ac
+
+    talent_bonus = 0
+    for t in talents:
+        if "+1 AC" in t:
+            talent_bonus += 1
+
+    return best_base_ac + bonus_ac + talent_bonus
+
+def ensure_backpack(character):
+    inventory = character.get('inventory', [])
+    if len(inventory) > 2 and "Backpack" not in inventory:
+        inventory.append("Backpack")
+        character['inventory'] = inventory
 
 def main():
-    # Load Data
-    gear_data = load_json('gear.json')
-    fighter_data = load_json('classes/fighter.json')
-    names_data = load_json('names.json')
-    
-    if not fighter_data or not names_data:
-        return
+    # --- ARGUMENT PARSING ---
+    parser = argparse.ArgumentParser(description="Generate a random Shadowdark character.")
+    parser.add_argument("--level", type=int, default=1, help="Level of the character (default: 1)")
+    args = parser.parse_args()
+    target_level = max(1, min(10, args.level)) # Clamp level between 1 and 10
 
-    # --- STATS ---
+    # --- 1. LOAD DATA ---
+    gear_data = load_json('gear.json')
+    names_data = load_json('names.json')
+    deities_data = load_json('deities.json')
+    backgrounds_data = load_json('backgrounds.json')
+    
+    # --- 2. STATS --- [cite: 181-199]
     stats_keys = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA']
     stats = {k: roll(3, 6) for k in stats_keys}
     mods = {k: get_mod(v) for k, v in stats.items()}
     
-    # --- ANCESTRY SELECTION ---
+    # --- 3. ANCESTRY & NAME --- [cite: 201-230, 424]
     ancestries = ['Human', 'Elf', 'Dwarf', 'Halfling', 'Half-Orc', 'Goblin']
     ancestry_name = random.choice(ancestries)
     
-    # Name Selection
     name_key = ancestry_name.lower().replace('-', '_')
     available_names = names_data.get('names', {}).get(name_key, ["Unknown"])
     name = random.choice(available_names)
 
-    # --- BASE CHARACTER OBJECT ---
+    # --- 4. ALIGNMENT --- [cite: 323-338]
+    alignments = ['Lawful', 'Neutral', 'Chaotic']
+    alignment = random.choice(alignments)
+    
+    # --- 5. DEITY --- [cite: 346-373]
+    valid_deities = [
+        d['name'] for d in deities_data.get('deities', []) 
+        if d.get('alignment') == alignment
+    ]
+    deity = random.choice(valid_deities) if valid_deities else "None"
+
+    # --- 6. BACKGROUND --- [cite: 175-180]
+    background_list = backgrounds_data.get('backgrounds', [])
+    background = random.choice(background_list) if background_list else "Unknown"
+
+    # --- 7. INITIALIZE CHARACTER OBJECT ---
     character = {
         "name": name,
         "ancestry": ancestry_name,
-        "class": fighter_data.get('class_name', 'Fighter'),
-        "level": 1,
-        "title": "Warrior",
-        "alignment": "",
-        "background": "",
-        "deity": "",
+        "class": "", 
+        "level": target_level,
+        "title": "",
+        "alignment": alignment,
+        "background": background,
+        "deity": deity,
         "stats": {k: {"score": stats[k], "modifier": mods[k]} for k in stats_keys},
         "hp": {"max": 0, "current": 0},
-        "ac": 10 + mods['DEX'],
+        "ac": 10,
         "languages": ["Common"],
         "traits": [],
         "talents": [],
@@ -86,102 +135,46 @@ def main():
         "gold": 0
     }
 
-    # --- APPLY ANCESTRY EFFECTS ---
-    # Dynamically import the correct ancestry module
+    # --- 8. APPLY ANCESTRY EFFECTS --- [cite: 201-230]
     try:
-        # Assuming files are in a folder named 'ancestries' with an __init__.py
         ancestry_module = importlib.import_module(f"ancestries.{name_key}")
         ancestry_module.apply_effects(character)
-    except ImportError as e:
-        print(f"Warning: Could not load ancestry module for {ancestry_name}. {e}")
+    except ImportError:
+        print(f"Warning: Could not load ancestry module for {ancestry_name}")
 
-    # --- HIT POINTS ---
-    # [cite_start]Fighter uses d8[cite: 235]. 
-    # Dwarf 'Stout' trait (advantage) is applied here logic-wise
-    hp_die_str = fighter_data.get('hit_points', '1d8')
-    hp_die = int(hp_die_str.split('d')[1].split()[0])
-    
-    if ancestry_name == 'Dwarf':
-        raw_hp = roll_advantage(1, hp_die) # [cite: 205]
-    else:
-        raw_hp = roll(1, hp_die)
+    # --- 9. APPLY CLASS (FIGHTER) --- [cite: 231-245]
+    fighter_class.apply_effects(character)
 
-    final_hp = max(1, raw_hp + mods['CON'])
-    
-    # Add to existing HP (Dwarf module might have already added +2)
-    character['hp']['max'] += final_hp
-    character['hp']['current'] += final_hp
-
-    # --- TALENTS ---
-    # [cite_start]Human 'Ambitious' trait gives +1 roll [cite: 229]
-    talent_rolls = 2 if ancestry_name == 'Human' else 1
-    
-    for _ in range(talent_rolls):
-        r = roll(2, 6)
-        effect = parse_talent(r, fighter_data.get('talent_table', []))
-        character['talents'].append(effect)
-        
-    # --- CLASS FEATURES ---
-    class_features = fighter_data.get('features', [])
-    for feature in class_features:
-        if feature['name'] == 'Weapon Mastery':
-             weapons = ["Bastard sword", "Greataxe", "Greatsword", "Longsword", "Shortsword", "Warhammer"]
-             character['talents'].append(f"Weapon Mastery: {random.choice(weapons)}")
-        elif feature['name'] == 'Grit':
-             character['talents'].append(f"Grit: {random.choice(['Strength', 'Dexterity'])}")
-        else:
-             character['talents'].append(f"{feature['name']}: {feature['effect']}")
-
-    # --- ALIGNMENT & DEITY ---
-    alignments = ['Lawful', 'Neutral', 'Chaotic']
-    character['alignment'] = random.choice(alignments)
-    
-    deities = {
-        'Lawful': ['Saint Terragnis', 'Madeera the Covenant'],
-        'Neutral': ['Gede', 'Ord'],
-        'Chaotic': ['Memnon', 'Shune the Vile', 'Ramlaat']
-    }
-    character['deity'] = random.choice(deities[character['alignment']])
-
-    # --- TITLE ---
-    # [cite_start]Determine Title based on alignment [cite: 314]
-    for t in fighter_data.get('titles', []):
-        if t['level'] == '1-2':
-            character['title'] = t.get(character['alignment'].lower(), "Warrior")
-            break
-
-    # --- BACKGROUND ---
-    backgrounds = [
-        "Urchin", "Wanted", "Cult Initiate", "Thieves' Guild", "Banished", 
-        "Orphaned", "Wizard's Apprentice", "Jeweler", "Herbalist", "Barbarian", 
-        "Mercenary", "Sailor", "Acolyte", "Soldier", "Ranger", "Scout", 
-        "Minstrel", "Scholar", "Noble", "Chirurgeon"
-    ]
-    character['background'] = random.choice(backgrounds)
-
-    # --- GEAR ---
+    # --- 10. GOLD & RANDOM GEAR --- [cite: 172, 1100-1102]
+    # Gold scales slightly with level for realism in this generator (house rule for higher level starts),
+    # or strictly stick to rules: "2d6 x 5 gold pieces" is for starting (Level 1).
+    # We will stick to the base rule but maybe give them more gear rolls.
     character['gold'] = roll(2, 6) * 5
     
-    # Starting Fighter Gear
-    character['inventory'].append("Leather armor")
-    character['inventory'].append(random.choice(["Longsword", "Greataxe", "Mace", "Shortsword"]))
-    
-    # Random Gear (1d6 items)
-    gear_list = gear_data.get('basic_gear', [])
-    if gear_list:
-        num_random_items = roll(1, 6)
+    basic_gear_list = gear_data.get('basic_gear', [])
+    if basic_gear_list:
+        # Higher levels might have accumulated more junk
+        num_random_items = roll(1, 6) + (target_level - 1)
         for _ in range(num_random_items):
-            item = random.choice(gear_list)
+            item = random.choice(basic_gear_list)
             character['inventory'].append(item['item'])
 
-    # --- OUTPUT ---
+    # --- 11. POST-GENERATION CHECKS ---
+    ensure_backpack(character)
+    character['ac'] = calculate_ac(character, gear_data)
+
+    # --- 12. OUTPUT ---
     os.makedirs('output', exist_ok=True)
-    filename = f"output/{character['name']}_{character['class']}_{character['level']}.json"
+    file_base = f"{character['name']}_{character['class']}_{character['level']}"
+    json_filename = f"output/{file_base}.json"
     
-    with open(filename, 'w') as f:
+    with open(json_filename, 'w') as f:
         json.dump(character, f, indent=2)
     
-    print(f"Character created: {filename}")
+    print(f"JSON Character created: {json_filename}")
+    
+    print("Generating PDF...")
+    pdf_character.fill_sheet(file_base)
 
 if __name__ == "__main__":
     main()

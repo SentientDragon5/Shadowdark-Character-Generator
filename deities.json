@@ -1,0 +1,52 @@
+{
+  "deities": [
+    {
+      "name": "Saint Terragnis",
+      "alignment": "Lawful",
+      "description": "A legendary knight who is the patron of most lawful humans. She ascended to godhood long ago and is the embodiment of righteousness and justice.",
+      "domains": ["Justice", "Righteousness", "Law"]
+    },
+    {
+      "name": "Gede",
+      "alignment": "Neutral",
+      "description": "The god of feasts, mirth, and the wilds. Gede is usually peaceful, but primal storms rage when her anger rises. Many elves and halflings worship her.",
+      "domains": ["Feasts", "Mirth", "Wilds", "Storms"]
+    },
+    {
+      "name": "Madeera the Covenant",
+      "alignment": "Lawful",
+      "description": "The first manifestation of Law. She carries every law of reality, a dictate called the Covenant, written on her skin in precise symbols.",
+      "domains": ["Law", "Reality", "Covenant"]
+    },
+    {
+      "name": "Ord",
+      "alignment": "Neutral",
+      "description": "Known as the Unbending, the Wise, the Secret-Keeper. He is the god of magic, knowledge, secrets, and equilibrium.",
+      "domains": ["Magic", "Knowledge", "Secrets", "Equilibrium"]
+    },
+    {
+      "name": "Memnon",
+      "alignment": "Chaotic",
+      "description": "The first manifestation of Chaos and Madeera's twin. A red-maned, leonine being whose ultimate ambition is to rend the cosmic laws of the Covenant from his sister's skin.",
+      "domains": ["Chaos", "Destruction", "Ambition"]
+    },
+    {
+      "name": "Shune the Vile",
+      "alignment": "Chaotic",
+      "description": "She whispers arcane secrets to sorcerers and witches who call to her in the dark hours. She schemes to displace Ord so she can control the vast flow of magic herself.",
+      "domains": ["Arcane Secrets", "Magic Control", "Schemes"]
+    },
+    {
+      "name": "Ramlaat",
+      "alignment": "Chaotic",
+      "description": "Known as the Pillager, the Barbaric, the Horde. Many orcs worship him and live by the Blood Rite, a prophecy that says only the strongest will survive a coming doom.",
+      "domains": ["Pillaging", "Barbarism", "Strength", "Blood Rite"]
+    },
+    {
+      "name": "The Lost",
+      "alignment": "Unknown",
+      "description": "Two of The Nine are lost to the ages, their names expunged from history and memory. Their legend lingers in ancient, forbidden texts.",
+      "domains": ["Forgotten", "Forbidden"]
+    }
+  ]
+}

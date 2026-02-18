@@ -90,5 +90,35 @@
       "cost": "5 sp",
       "quantity_per_slot": "1"
     }
+  ],
+  "armor": [
+    {
+      "item": "Leather armor",
+      "cost": "10 gp",
+      "gear_slots": 1,
+      "ac_effect": "11 + DEX mod",
+      "properties": ""
+    },
+    {
+      "item": "Chainmail",
+      "cost": "60 gp",
+      "gear_slots": 2,
+      "ac_effect": "13 + DEX mod",
+      "properties": "Disadv on stealth, swim"
+    },
+    {
+      "item": "Plate mail",
+      "cost": "130 gp",
+      "gear_slots": 3,
+      "ac_effect": "15",
+      "properties": "No swim, disadv stealth"
+    },
+    {
+      "item": "Shield",
+      "cost": "10 gp",
+      "gear_slots": 1,
+      "ac_effect": "+2",
+      "properties": "Occupies one hand"
+    }
   ]
 }
