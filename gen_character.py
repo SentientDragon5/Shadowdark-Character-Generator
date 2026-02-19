@@ -131,9 +131,11 @@ def parse_args():
     parser.add_argument("-l", "--level", type=int, default=1)
     parser.add_argument("-c", "--class", type=str, dest="char_class", default=None)
     parser.add_argument("-a", "--ancestry", type=str, default=None)
+    parser.add_argument("-q", "--quantity", type=int, default=1)
     args = parser.parse_args()
     
     target_level = max(1, min(10, args.level))
+    quantity = max(1, args.quantity)
     
     chosen_class = None
     if args.char_class:
@@ -156,4 +158,4 @@ def parse_args():
         }
         ancestry = ancestry_map.get(a)
         
-    return target_level, chosen_class, ancestry
+    return target_level, chosen_class, ancestry, quantity
