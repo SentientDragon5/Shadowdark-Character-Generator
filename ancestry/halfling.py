@@ -1,8 +1,8 @@
 def apply_effects(character):
     """
-    Applies Goblin ancestry effects:
-    - [cite_start]Languages: Common, Goblin [cite: 212]
-    - [cite_start]Keen Senses: You can't be surprised. [cite: 213]
+    Applies Halfling ancestry effects:
+    - [cite_start]Languages: Common [cite: 217]
+    - [cite_start]Stealthy: Once per day, you can become invisible for 3 rounds. [cite: 218]
     """
-    character['languages'].append("Goblin")
-    character['traits'].append("Keen Senses: You can't be surprised")
+    # Halflings only know Common by default, which is already in the base.
+    character['traits'].append("Stealthy: Once per day, become invisible for 3 rounds")

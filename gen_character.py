@@ -3,7 +3,6 @@ import random
 import os
 import importlib
 import argparse
-import classes.fighter as fighter_class
 import pdf_character
 
 def roll(n, d): return sum(random.randint(1, d) for _ in range(n))
@@ -57,9 +56,38 @@ def ensure_backpack(character):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--level", type=int, default=1)
+    parser.add_argument("-l", "--level", type=int, default=1)
+    parser.add_argument("-c", "--class", type=str, dest="char_class", default=None)
+    parser.add_argument("-a", "--ancestry", type=str, default=None)
     args = parser.parse_args()
     target_level = max(1, min(10, args.level))
+
+    available_classes = ['fighter', 'priest', 'wizard', 'thief']
+    if args.char_class:
+        c = args.char_class.lower()
+        if c in ['p', 'priest']: chosen_class = 'priest'
+        elif c in ['f', 'fighter']: chosen_class = 'fighter'
+        elif c in ['w', 'wizard']: chosen_class = 'wizard'
+        elif c in ['t', 'thief']: chosen_class = 'thief'
+        else: chosen_class = random.choice(available_classes)
+    else:
+        chosen_class = random.choice(available_classes)
+
+    available_ancestries = ['Human', 'Elf', 'Dwarf', 'Halfling', 'Half-Orc', 'Goblin']
+    ancestry_map = {
+        'hu': 'Human', 'human': 'Human',
+        'e': 'Elf', 'elf': 'Elf',
+        'd': 'Dwarf', 'dwarf': 'Dwarf',
+        'ha': 'Halfling', 'halfling': 'Halfling',
+        'ho': 'Half-Orc', 'half-orc': 'Half-Orc', 'halforc': 'Half-Orc',
+        'g': 'Goblin', 'goblin': 'Goblin'
+    }
+    
+    if args.ancestry:
+        a = args.ancestry.lower()
+        ancestry = ancestry_map.get(a, random.choice(available_ancestries))
+    else:
+        ancestry = random.choice(available_ancestries)
 
     gear_data = load_json('gear.json')
     names_data = load_json('names.json')
@@ -70,8 +98,6 @@ def main():
     stats = {k: roll(3, 6) for k in stats_keys}
     mods = {k: get_mod(v) for k, v in stats.items()}
     
-    ancestries = ['Human', 'Elf', 'Dwarf', 'Halfling', 'Half-Orc', 'Goblin']
-    ancestry = random.choice(ancestries)
     name_key = ancestry.lower().replace('-', '_')
     names = names_data.get('names', {}).get(name_key, ["Unknown"])
     name = random.choice(names)
@@ -89,16 +115,17 @@ def main():
         "title": "", "alignment": align, "background": bg, "deity": deity,
         "stats": {k: {"score": stats[k], "modifier": mods[k]} for k in stats_keys},
         "hp": {"max": 0, "current": 0}, "ac": 10, "languages": ["Common"],
-        "traits": [], "talents": [], "inventory": [], "attacks": [], "gold": 0
+        "traits": [], "talents": [], "spells": [], "inventory": [], "attacks": [], "gold": 0
     }
 
     try:
-        mod = importlib.import_module(f"ancestries.{name_key}")
+        mod = importlib.import_module(f"ancestry.{name_key}")
         mod.apply_effects(character)
-    except: pass
+    except Exception:
+        pass
 
-    # PASS GEAR DATA HERE
-    fighter_class.apply_effects(character, gear_data)
+    class_mod = importlib.import_module(f"classes.{chosen_class}")
+    class_mod.apply_effects(character, gear_data)
 
     character['gold'] = roll(2, 6) * 5
     basic_gear = gear_data.get('basic_gear', [])
@@ -110,6 +137,12 @@ def main():
     ensure_backpack(character)
     character['ac'] = calculate_ac(character, gear_data)
     
+    max_inv = max(10, character['stats']['STR']['score'])
+    if any("Hauler" in t for t in character.get('traits', [])):
+        con_mod = character['stats']['CON']['modifier']
+        if con_mod > 0: max_inv += con_mod
+    character['max_inventory'] = max_inv
+    
     os.makedirs('output', exist_ok=True)
     file_base = f"{character['name']}_{character['class']}_{character['level']}"
     json_path = f"output/{file_base}.json"
@@ -118,7 +151,6 @@ def main():
         json.dump(character, f, indent=2)
     print(f"JSON created: {json_path}")
     
-    # Call the updated PDF generator
     pdf_character.fill_sheet(file_base)
 
 if __name__ == "__main__": 

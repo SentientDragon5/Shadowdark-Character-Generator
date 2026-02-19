@@ -33,8 +33,20 @@ def fill_sheet(filename):
         attacks_list.append(attack_str)
 
     ts = []
-    if data.get("talents"):
-        ts.extend(["- Talents -"] + data["talents"])
+    talents = data.get("talents", [])
+    spells = data.get("spells", [])
+    
+    pure_talents = []
+    for t in talents:
+        if str(t).startswith("Spell: "):
+            spells.append(str(t).replace("Spell: ", ""))
+        else:
+            pure_talents.append(t)
+
+    if pure_talents:
+        ts.extend(["- Talents -"] + pure_talents)
+    if spells:
+        ts.extend(["- Spells -"] + spells)
     if data.get("languages"):
         ts.extend(["- Languages -"] + data["languages"])
     if data.get("traits"):
@@ -73,6 +85,10 @@ def fill_sheet(filename):
 
     for i, item in enumerate(data.get("inventory", [])[:20], 1):
         fields[f"Gear {i}"] = item
+
+    max_inv = data.get("max_inventory", 20)
+    for i in range(max_inv + 1, 21):
+        fields[f"Gear {i}"] = "X"
 
     writer.update_page_form_field_values(writer.pages[0], fields)
 
