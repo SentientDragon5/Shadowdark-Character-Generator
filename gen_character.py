@@ -115,7 +115,7 @@ def main():
         "title": "", "alignment": align, "background": bg, "deity": deity,
         "stats": {k: {"score": stats[k], "modifier": mods[k]} for k in stats_keys},
         "hp": {"max": 0, "current": 0}, "ac": 10, "languages": ["Common"],
-        "traits": [], "talents": [], "spells": [], "inventory": [], "attacks": [], "gold": 0
+        "traits": [], "talents": [], "spells": [], "inventory": [], "free_to_carry": [], "attacks": [], "gold": 0
     }
 
     try:
@@ -135,6 +135,16 @@ def main():
             character['inventory'].append(random.choice(basic_gear)['item'])
 
     ensure_backpack(character)
+
+    if "Backpack" in character['inventory']:
+        character['inventory'].remove("Backpack")
+        character['free_to_carry'].append("Backpack")
+    
+    extra_coins = max(0, character['gold'] - 100)
+    coin_slots = (extra_coins + 99) // 100
+    for _ in range(coin_slots):
+        character['inventory'].append("100 Coins")
+
     character['ac'] = calculate_ac(character, gear_data)
     
     max_inv = max(10, character['stats']['STR']['score'])

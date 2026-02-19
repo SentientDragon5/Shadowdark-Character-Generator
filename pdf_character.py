@@ -69,6 +69,7 @@ def fill_sheet(filename):
         "Gold Pieces": str(data.get("gold", "")),
         "Talents / Spells": "\n".join(ts),
         "Attacks": "\n".join(attacks_list),
+        "Free To Carry": "\n".join(data.get("free_to_carry", [])),
         "Strength Total": str(s.get("STR", {}).get("score", "")),
         "Strength Modifier": f"{s.get('STR', {}).get('modifier', 0):+}",
         "Dexterity Total": str(s.get("DEX", {}).get("score", "")),
