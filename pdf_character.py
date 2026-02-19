@@ -55,6 +55,16 @@ def fill_sheet(filename):
         profs = [f"{k.capitalize()}: {v}" for k, v in data["proficiencies"].items()]
         ts.append(f"Proficiencies\n{', '.join(profs)}\n")
 
+    gold_val = data.get("gold", 0)
+    try:
+        total_cp = int(round(float(gold_val) * 100))
+    except (ValueError, TypeError):
+        total_cp = 0
+
+    gp = total_cp // 100
+    sp = (total_cp % 100) // 10
+    cp = total_cp % 10
+
     fields = {
         "Name": data.get("name", ""),
         "Race": data.get("ancestry", ""),
@@ -66,7 +76,9 @@ def fill_sheet(filename):
         "Deity": data.get("deity", ""),
         "Hit Points": str(data.get("hp", {}).get("max", "")),
         "Armor Class": str(data.get("ac", "")),
-        "Gold Pieces": str(data.get("gold", "")),
+        "Gold Pieces": str(gp),
+        "Silver Pieces": str(sp),
+        "Copper Pieces": str(cp),
         "Talents / Spells": "".join(ts).strip(),
         "Attacks": "\n".join(attacks_list),
         "Free To Carry": "\n".join(data.get("free_to_carry", [])),

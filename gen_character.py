@@ -23,6 +23,12 @@ def load_json(path):
         with open(path, 'r') as f: return json.load(f)
     except FileNotFoundError: return {}
 
+def get_cost_cp(cost_str):
+    try:
+        a, u = cost_str.lower().split()
+        return int(a) * {'gp': 100, 'sp': 10, 'cp': 1}.get(u, 0)
+    except: return 0
+
 def calculate_ac(character, gear_data):
     inventory = character.get('inventory', [])
     dex_mod = character['stats']['DEX']['modifier']
@@ -128,20 +134,33 @@ def main():
     class_mod = importlib.import_module(f"classes.{chosen_class}")
     class_mod.apply_effects(character, gear_data)
 
-    character['gold'] = roll(2, 6) * 5
+    starting_gold = roll(2, 6) * 5
+    funds_cp = starting_gold * 100
+    
     basic_gear = gear_data.get('basic_gear', [])
     if basic_gear:
         count = roll(1, 6) + (target_level - 1)
         for _ in range(count):
-            character['inventory'].append(random.choice(basic_gear)['item'])
+            item = random.choice(basic_gear)
+            cost_cp = get_cost_cp(item['cost'])
+            if funds_cp >= cost_cp:
+                funds_cp -= cost_cp
+                character['inventory'].append(item['item'])
+                
+    character['gold'] = round(funds_cp / 100, 2)
 
     ensure_backpack(character)
 
     if "Backpack" in character['inventory']:
         character['inventory'].remove("Backpack")
         character['free_to_carry'].append("Backpack")
+
+    for tool in ["Thieves' tools", "Thieves tools", "Thieves' Tools"]:
+        if tool in character['inventory']:
+            character['inventory'].remove(tool)
+            character['free_to_carry'].append(tool)
     
-    extra_coins = max(0, character['gold'] - 100)
+    extra_coins = max(0, int(character['gold']) - 100)
     coin_slots = (extra_coins + 99) // 100
     for _ in range(coin_slots):
         character['inventory'].append("100 Coins")
