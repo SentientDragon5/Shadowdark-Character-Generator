@@ -56,100 +56,42 @@ def calculate_ac(character, gear_data):
         if "+1 AC" in t: bonus_ac += 1
     return best_base_ac + bonus_ac
 
-def ensure_backpack(character):
-    if len(character['inventory']) > 2 and "Backpack" not in character['inventory']:
-        character['inventory'].append("Backpack")
-
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-l", "--level", type=int, default=1)
-    parser.add_argument("-c", "--class", type=str, dest="char_class", default=None)
-    parser.add_argument("-a", "--ancestry", type=str, default=None)
-    args = parser.parse_args()
-    target_level = max(1, min(10, args.level))
-
-    available_classes = ['fighter', 'priest', 'wizard', 'thief', 'apothecary']
-    if args.char_class:
-        c = args.char_class.lower()
-        if c in ['p', 'priest']: chosen_class = 'priest'
-        elif c in ['f', 'fighter']: chosen_class = 'fighter'
-        elif c in ['w', 'wizard']: chosen_class = 'wizard'
-        elif c in ['t', 'thief']: chosen_class = 'thief'
-        elif c in ['a', 'apothecary']: chosen_class = 'apothecary'
-        else: chosen_class = random.choice(available_classes)
-    else:
-        chosen_class = random.choice(available_classes)
-
-    available_ancestries = ['Human', 'Elf', 'Dwarf', 'Halfling', 'Half-Orc', 'Goblin']
-    ancestry_map = {
-        'hu': 'Human', 'human': 'Human',
-        'e': 'Elf', 'elf': 'Elf',
-        'd': 'Dwarf', 'dwarf': 'Dwarf',
-        'ha': 'Halfling', 'halfling': 'Halfling',
-        'ho': 'Half-Orc', 'half-orc': 'Half-Orc', 'halforc': 'Half-Orc',
-        'g': 'Goblin', 'goblin': 'Goblin'
-    }
-    
-    if args.ancestry:
-        a = args.ancestry.lower()
-        ancestry = ancestry_map.get(a, random.choice(available_ancestries))
-    else:
-        ancestry = random.choice(available_ancestries)
-
-    gear_data = load_json('gear.json')
-    names_data = load_json('names.json')
-    deities_data = load_json('deities.json')
-    backgrounds_data = load_json('backgrounds.json')
-    
+def roll_stats():
     stats_keys = ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA']
     stats = {k: roll(3, 6) for k in stats_keys}
     mods = {k: get_mod(v) for k, v in stats.items()}
-    
-    name_key = ancestry.lower().replace('-', '_')
-    names = names_data.get('names', {}).get(name_key, ["Unknown"])
-    name = random.choice(names)
+    return stats, mods
 
-    alignments = ['Lawful', 'Neutral', 'Chaotic']
-    align = random.choice(alignments)
-    valid_deities = [d['name'] for d in deities_data.get('deities', []) if d.get('alignment') == align]
-    deity = random.choice(valid_deities) if valid_deities else "None"
-    
-    bg_list = backgrounds_data.get('backgrounds', [])
-    bg = random.choice(bg_list) if bg_list else "Unknown"
-
-    character = {
-        "name": name, "ancestry": ancestry, "class": "", "level": target_level,
+def create_base_character(name, ancestry, chosen_class, level, align, bg, deity, stats, mods):
+    return {
+        "name": name, "ancestry": ancestry, "class": chosen_class, "level": level,
         "title": "", "alignment": align, "background": bg, "deity": deity,
-        "stats": {k: {"score": stats[k], "modifier": mods[k]} for k in stats_keys},
+        "stats": {k: {"score": stats[k], "modifier": mods[k]} for k in stats.keys()},
         "hp": {"max": 0, "current": 0}, "ac": 10, "languages": ["Common"],
         "traits": [], "talents": [], "spells": [], "inventory": [], "free_to_carry": [], "attacks": [], "gold": 0
     }
 
+def apply_ancestry_and_class(character, gear_data):
+    name_key = character['ancestry'].lower().replace('-', '_')
+    chosen_class = character['class'].lower()
+    
     try:
         mod = importlib.import_module(f"ancestry.{name_key}")
         mod.apply_effects(character)
     except Exception:
         pass
 
-    class_mod = importlib.import_module(f"classes.{chosen_class}")
-    class_mod.apply_effects(character, gear_data)
+    try:
+        class_mod = importlib.import_module(f"classes.{chosen_class}")
+        class_mod.apply_effects(character, gear_data)
+    except Exception:
+        pass
 
-    starting_gold = roll(2, 6) * 5
-    funds_cp = starting_gold * 100
-    
-    basic_gear = gear_data.get('basic_gear', [])
-    if basic_gear:
-        count = roll(1, 6) + (target_level - 1)
-        for _ in range(count):
-            item = random.choice(basic_gear)
-            cost_cp = get_cost_cp(item['cost'])
-            if funds_cp >= cost_cp:
-                funds_cp -= cost_cp
-                character['inventory'].append(item['item'])
-                
+def finalize_inventory_and_ac(character, gear_data, funds_cp):
     character['gold'] = round(funds_cp / 100, 2)
 
-    ensure_backpack(character)
+    if len(character['inventory']) > 2 and "Backpack" not in character['inventory']:
+        character['inventory'].append("Backpack")
 
     if "Backpack" in character['inventory']:
         character['inventory'].remove("Backpack")
@@ -172,7 +114,8 @@ def main():
         con_mod = character['stats']['CON']['modifier']
         if con_mod > 0: max_inv += con_mod
     character['max_inventory'] = max_inv
-    
+
+def save_character(character):
     os.makedirs('output', exist_ok=True)
     file_base = f"{character['name']}_{character['class']}_{character['level']}"
     json_path = f"output/{file_base}.json"
@@ -183,5 +126,36 @@ def main():
     
     pdf_character.fill_sheet(file_base)
 
-if __name__ == "__main__": 
-    main()
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-l", "--level", type=int, default=1)
+    parser.add_argument("-c", "--class", type=str, dest="char_class", default=None)
+    parser.add_argument("-a", "--ancestry", type=str, default=None)
+    parser.add_argument("-q", "--quantity", type=int, default=1)
+    args = parser.parse_args()
+    
+    target_level = max(1, min(10, args.level))
+    quantity = max(1, args.quantity)
+    
+    chosen_class = None
+    if args.char_class:
+        c = args.char_class.lower()
+        if c in ['p', 'priest']: chosen_class = 'priest'
+        elif c in ['f', 'fighter']: chosen_class = 'fighter'
+        elif c in ['w', 'wizard']: chosen_class = 'wizard'
+        elif c in ['t', 'thief']: chosen_class = 'thief'
+
+    ancestry = None
+    if args.ancestry:
+        a = args.ancestry.lower()
+        ancestry_map = {
+            'hu': 'Human', 'human': 'Human',
+            'e': 'Elf', 'elf': 'Elf',
+            'd': 'Dwarf', 'dwarf': 'Dwarf',
+            'ha': 'Halfling', 'halfling': 'Halfling',
+            'ho': 'Half-Orc', 'half-orc': 'Half-Orc', 'halforc': 'Half-Orc',
+            'g': 'Goblin', 'goblin': 'Goblin'
+        }
+        ancestry = ancestry_map.get(a)
+        
+    return target_level, chosen_class, ancestry, quantity
