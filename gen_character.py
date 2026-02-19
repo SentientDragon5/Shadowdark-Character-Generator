@@ -87,6 +87,54 @@ def apply_ancestry_and_class(character, gear_data):
     except Exception:
         pass
 
+def update_attacks(character, gear_data):
+    weapon_lookup = {w['item']: w for w in gear_data.get('weapons', [])}
+    existing_attacks = [a['name'] for a in character.get('attacks', [])]
+    
+    chosen_class = character['class'].lower()
+    calc_bonus = None
+    try:
+        class_mod = importlib.import_module(f"classes.{chosen_class}")
+        calc_bonus = getattr(class_mod, 'calculate_attack_bonus', None)
+    except Exception:
+        pass
+
+    for item_name in character['inventory']:
+        if item_name in weapon_lookup and item_name not in existing_attacks:
+            w_data = weapon_lookup[item_name]
+            if calc_bonus:
+                try:
+                    hit, dmg_mod = calc_bonus(w_data, character, gear_data)
+                except Exception:
+                    hit, dmg_mod = 0, 0
+            else:
+                w_type = w_data.get('type', 'M')
+                props = w_data.get('properties', '')
+                str_mod = character['stats']['STR']['modifier']
+                dex_mod = character['stats']['DEX']['modifier']
+                
+                if "F" in props: attr_mod = max(str_mod, dex_mod)
+                elif w_type == 'R': attr_mod = dex_mod
+                else: attr_mod = str_mod
+                
+                hit, dmg_mod = attr_mod, attr_mod
+                traits = character.get('traits', [])
+                if w_type == 'M' and any("Mighty" in t for t in traits):
+                    hit += 1
+                    dmg_mod += 1
+            
+            sign = "+" if hit >= 0 else ""
+            dmg_sign = "+" if dmg_mod >= 0 else ""
+            
+            atk_obj = {
+                "name": item_name,
+                "atk": f"{sign}{hit}",
+                "damage": f"{w_data['damage']}{dmg_sign}{dmg_mod}",
+                "range": w_data['range'],
+                "properties": w_data['properties']
+            }
+            character['attacks'].append(atk_obj)
+
 def finalize_inventory_and_ac(character, gear_data, funds_cp):
     character['gold'] = round(funds_cp / 100, 2)
 
@@ -114,6 +162,8 @@ def finalize_inventory_and_ac(character, gear_data, funds_cp):
         con_mod = character['stats']['CON']['modifier']
         if con_mod > 0: max_inv += con_mod
     character['max_inventory'] = max_inv
+
+    update_attacks(character, gear_data)
 
 def save_character(character):
     os.makedirs('output', exist_ok=True)
