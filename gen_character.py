@@ -150,7 +150,7 @@ def finalize_inventory_and_ac(character, gear_data, funds_cp):
             character['inventory'].remove(tool)
             character['free_to_carry'].append(tool)
             
-    if character['class'].lower() == 'apothecary' or character['class'] == 'Apothecary':
+    if character['class'].lower() == 'apothecary':
         if "Brewing Kit" in character['inventory']:
             character['inventory'].remove("Brewing Kit")
         if "Brewing Kit" not in character['free_to_carry']:
