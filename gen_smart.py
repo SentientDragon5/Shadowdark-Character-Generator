@@ -75,7 +75,7 @@ def main():
         elif chosen_class == 'wizard':
             priority_list += ["Staff", "Dagger"]
         elif chosen_class == 'apothecary':
-            priority_list += ["Leather armor", "Crossbow", "Crossbow bolts (20)", "Dagger", "Flask or bottle"]
+            priority_list += ["Leather armor", "Vial (15)", "Blowgun", "Syringe Dart (16)", "Dagger", "Throwing Flask (15)"]
         
         priority_list += ["Flint and steel", "Torch", "Torch", "Rope, 60'", "Grappling hook", "Crowbar", "Mirror"]
 

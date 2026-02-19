@@ -101,6 +101,14 @@ def finalize_inventory_and_ac(character, gear_data, funds_cp):
         if tool in character['inventory']:
             character['inventory'].remove(tool)
             character['free_to_carry'].append(tool)
+            
+    if character['class'].lower() == 'apothecary' or character['class'] == 'Apothecary':
+        if "Brewing Kit" in character['inventory']:
+            character['inventory'].remove("Brewing Kit")
+        if "Brewing Kit" not in character['free_to_carry']:
+            character['free_to_carry'].append("Brewing Kit")
+        if "Reagents" not in character['free_to_carry']:
+            character['free_to_carry'].append("Reagents")
     
     extra_coins = max(0, int(character['gold']) - 100)
     coin_slots = (extra_coins + 99) // 100
