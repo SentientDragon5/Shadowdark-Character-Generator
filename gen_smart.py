@@ -32,7 +32,7 @@ def main():
             elif chosen_class == 'wizard': ancestry = random.choice(['Elf', 'Human'])
             elif chosen_class == 'priest': ancestry = random.choice(['Dwarf', 'Human'])
             elif chosen_class == 'thief': ancestry = random.choice(['Halfling', 'Goblin', 'Human'])
-            elif chosen_class == 'apothecary': ancestry = random.choice(['Goblin', 'Half-Orc', 'Human'])
+            elif chosen_class == 'apothecary': ancestry = random.choice(['Goblin', 'Halfling', 'Human','Elf'])
             else: ancestry = 'Human'
 
         alignments = ['Lawful', 'Neutral', 'Chaotic']
