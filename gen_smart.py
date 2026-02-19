@@ -19,9 +19,10 @@ def main():
         else:
             best_stat = max(stats, key=lambda k: stats[k])
             if best_stat == 'STR': chosen_class = 'fighter'
-            elif best_stat == 'INT': chosen_class = 'wizard'
+            elif best_stat == 'INT': chosen_class = random.choice(['wizard', 'apothecary'])
             elif best_stat == 'WIS': chosen_class = 'priest'
             elif best_stat == 'DEX': chosen_class = 'thief'
+            elif best_stat == 'CON': chosen_class = 'apothecary'
             else: chosen_class = 'fighter'
 
         if user_ancestry:
@@ -31,6 +32,7 @@ def main():
             elif chosen_class == 'wizard': ancestry = random.choice(['Elf', 'Human'])
             elif chosen_class == 'priest': ancestry = random.choice(['Dwarf', 'Human'])
             elif chosen_class == 'thief': ancestry = random.choice(['Halfling', 'Goblin', 'Human'])
+            elif chosen_class == 'apothecary': ancestry = random.choice(['Goblin', 'Half-Orc', 'Human'])
             else: ancestry = 'Human'
 
         alignments = ['Lawful', 'Neutral', 'Chaotic']
@@ -72,6 +74,8 @@ def main():
             priority_list += ["Leather armor", "Shortsword", "Shortbow", "Arrows (20)"]
         elif chosen_class == 'wizard':
             priority_list += ["Staff", "Dagger"]
+        elif chosen_class == 'apothecary':
+            priority_list += ["Leather armor", "Crossbow", "Crossbow bolts (20)", "Dagger", "Flask or bottle"]
         
         priority_list += ["Flint and steel", "Torch", "Torch", "Rope, 60'", "Grappling hook", "Crowbar", "Mirror"]
 

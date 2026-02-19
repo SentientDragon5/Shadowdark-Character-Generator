@@ -144,6 +144,7 @@ def parse_args():
         elif c in ['f', 'fighter']: chosen_class = 'fighter'
         elif c in ['w', 'wizard']: chosen_class = 'wizard'
         elif c in ['t', 'thief']: chosen_class = 'thief'
+        elif c in ['a', 'apothecary']: chosen_class = 'apothecary'
 
     ancestry = None
     if args.ancestry:

@@ -9,7 +9,7 @@ def main():
     deities_data = gen_character.load_json('deities.json')
     backgrounds_data = gen_character.load_json('backgrounds.json')
 
-    classes = ['fighter', 'priest', 'wizard', 'thief']
+    classes = ['fighter', 'priest', 'wizard', 'thief', 'apothecary']
     ancestries = ['Human', 'Elf', 'Dwarf', 'Halfling', 'Half-Orc', 'Goblin']
     alignments = ['Lawful', 'Neutral', 'Chaotic']
 
