@@ -62,13 +62,14 @@ def main():
     args = parser.parse_args()
     target_level = max(1, min(10, args.level))
 
-    available_classes = ['fighter', 'priest', 'wizard', 'thief']
+    available_classes = ['fighter', 'priest', 'wizard', 'thief', 'apothecary']
     if args.char_class:
         c = args.char_class.lower()
         if c in ['p', 'priest']: chosen_class = 'priest'
         elif c in ['f', 'fighter']: chosen_class = 'fighter'
         elif c in ['w', 'wizard']: chosen_class = 'wizard'
         elif c in ['t', 'thief']: chosen_class = 'thief'
+        elif c in ['a', 'apothecary']: chosen_class = 'apothecary'
         else: chosen_class = random.choice(available_classes)
     else:
         chosen_class = random.choice(available_classes)
