@@ -44,16 +44,16 @@ def fill_sheet(filename):
             pure_talents.append(t)
 
     if pure_talents:
-        ts.extend(["- Talents -"] + pure_talents)
+        ts.append(f"Talents\n{', '.join(pure_talents)}\n")
     if spells:
-        ts.extend(["- Spells -"] + spells)
+        ts.append(f"Spells\n{', '.join(spells)}\n")
     if data.get("languages"):
-        ts.extend(["- Languages -"] + data["languages"])
+        ts.append(f"Languages\n{', '.join(data['languages'])}\n")
     if data.get("traits"):
-        ts.extend(["- Traits -"] + data["traits"])
+        ts.append(f"Traits\n{', '.join(data['traits'])}\n")
     if data.get("proficiencies"):
-        ts.append("- Proficiencies -")
-        ts.extend([f"{k.capitalize()}: {v}" for k, v in data["proficiencies"].items()])
+        profs = [f"{k.capitalize()}: {v}" for k, v in data["proficiencies"].items()]
+        ts.append(f"Proficiencies\n{', '.join(profs)}\n")
 
     fields = {
         "Name": data.get("name", ""),
@@ -67,7 +67,7 @@ def fill_sheet(filename):
         "Hit Points": str(data.get("hp", {}).get("max", "")),
         "Armor Class": str(data.get("ac", "")),
         "Gold Pieces": str(data.get("gold", "")),
-        "Talents / Spells": "\n".join(ts),
+        "Talents / Spells": "".join(ts).strip(),
         "Attacks": "\n".join(attacks_list),
         "Free To Carry": "\n".join(data.get("free_to_carry", [])),
         "Strength Total": str(s.get("STR", {}).get("score", "")),
