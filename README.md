@@ -27,6 +27,8 @@ python gen_smart.py -h
 
 These let you set the level, ancestry, class, or quantity of characters generated.
 
+You can view the pdf in VSCode with an extention like [this](https://marketplace.visualstudio.com/items?itemName=tomoki1207.pdf)
+
 ## Credits
 
 Made for Shadowdark, created by Kelsey Dionne
