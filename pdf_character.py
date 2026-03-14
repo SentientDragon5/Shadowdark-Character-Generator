@@ -1,13 +1,11 @@
 import json
 import os
+import argparse
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import NameObject
 
-def fill_sheet(filename):
-    out_dir = "output"
-    json_path = os.path.join(out_dir, f"{filename}.json")
+def generate_pdf(json_path, output_path):
     pdf_path = "ShadowDark Character Sheet Fillable.pdf"
-    output_path = os.path.join(out_dir, f"{filename}_Filled.pdf")
 
     if not os.path.exists(json_path) or not os.path.exists(pdf_path):
         return
@@ -108,5 +106,16 @@ def fill_sheet(filename):
     with open(output_path, "wb") as f:
         writer.write(f)
 
+def fill_sheet(filename):
+    out_dir = "output"
+    json_path = os.path.join(out_dir, f"{filename}.json")
+    output_path = os.path.join(out_dir, f"{filename}_Filled.pdf")
+    generate_pdf(json_path, output_path)
+
 if __name__ == "__main__":
-    pass
+    parser = argparse.ArgumentParser()
+    parser.add_argument("json_path", type=str)
+    args = parser.parse_args()
+    
+    output_pdf_path = args.json_path.replace(".json", "_Filled.pdf")
+    generate_pdf(args.json_path, output_pdf_path)
