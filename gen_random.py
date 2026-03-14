@@ -10,7 +10,7 @@ def main():
     backgrounds_data = gen_character.load_json('backgrounds.json')
 
     classes = ['fighter', 'priest', 'wizard', 'thief', 'apothecary']
-    ancestries = ['Human', 'Elf', 'Dwarf', 'Halfling', 'Half-Orc', 'Goblin']
+    ancestries = ['Human', 'Elf', 'Dwarf', 'Halfling', 'Half-Orc', 'Goblin', 'Molluscfolk']
     alignments = ['Lawful', 'Neutral', 'Chaotic']
 
     for _ in range(quantity):

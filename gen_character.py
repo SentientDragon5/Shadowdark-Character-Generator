@@ -169,6 +169,8 @@ def finalize_inventory_and_ac(character, gear_data, funds_cp):
     if any("Hauler" in t for t in character.get('traits', [])):
         con_mod = character['stats']['CON']['modifier']
         if con_mod > 0: max_inv += con_mod
+    if any("+3 gear slots" in t for t in character.get('traits', [])):
+        max_inv += 3
     character['max_inventory'] = max_inv
 
     update_attacks(character, gear_data)
@@ -213,7 +215,8 @@ def parse_args():
             'd': 'Dwarf', 'dwarf': 'Dwarf',
             'ha': 'Halfling', 'halfling': 'Halfling',
             'ho': 'Half-Orc', 'half-orc': 'Half-Orc', 'halforc': 'Half-Orc',
-            'g': 'Goblin', 'goblin': 'Goblin'
+            'g': 'Goblin', 'goblin': 'Goblin',
+            'm': 'Molluscfolk', 'molluscfolk': 'Molluscfolk', 'molluskfolk': 'Molluscfolk'
         }
         ancestry = ancestry_map.get(a)
         

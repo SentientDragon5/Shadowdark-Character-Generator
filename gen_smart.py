@@ -28,11 +28,11 @@ def main():
         if user_ancestry:
             ancestry = user_ancestry
         else:
-            if chosen_class == 'fighter': ancestry = random.choice(['Dwarf', 'Half-Orc', 'Human'])
+            if chosen_class == 'fighter': ancestry = random.choice(['Dwarf', 'Half-Orc', 'Human', 'Molluscfolk'])
             elif chosen_class == 'wizard': ancestry = random.choice(['Elf', 'Human'])
-            elif chosen_class == 'priest': ancestry = random.choice(['Dwarf', 'Human'])
+            elif chosen_class == 'priest': ancestry = random.choice(['Dwarf', 'Human', 'Molluscfolk'])
             elif chosen_class == 'thief': ancestry = random.choice(['Halfling', 'Goblin', 'Human'])
-            elif chosen_class == 'apothecary': ancestry = random.choice(['Goblin', 'Halfling', 'Human','Elf'])
+            elif chosen_class == 'apothecary': ancestry = random.choice(['Goblin', 'Halfling', 'Human','Elf', 'Molluscfolk'])
             else: ancestry = 'Human'
 
         alignments = ['Lawful', 'Neutral', 'Chaotic']
