@@ -3,6 +3,17 @@
 A [Shadowdark TTRPG](https://www.thearcanelibrary.com/pages/shadowdark?srsltid=AfmBOoqEC10jtoUg5wPzeaGuIaDnixV_WHS8jxFMCkw1owHMC8o_A2uR) character generator. Written to be modified so that additional classes, ancestries, gear, deities, names, backgrounds... can be edited through code.
 The generated characters are by no means perfect, and can and should be modified if used. This project was for if you needed to batch a large amount of random characters.
 
+## Setup
+
+Download the fonts from dafont.com and place them in the font foler.
+- [Old NewsPaper](https://www.dafont.com/old-newspaper-font.font) (Free for personal use)
+- [JSL Blackletter](https://www.dafont.com/jsl-blackletter.font) (100% Free)
+- [Monserrat](https://fonts.google.com/specimen/Montserrat) (Google Fonts)
+  - Note: Only put the regular font. The fonts are referenced in the `pdf_print_singles.py` and `pdf_character.py`
+
+Make sure to download Python.
+Once this project is cloned, `pip install -r requirements.txt`
+
 ## How to Use
 
 Enusre Python is installed. This was built for 3.12, should be compatible with other versions.

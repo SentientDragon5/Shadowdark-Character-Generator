@@ -6,6 +6,12 @@ import textwrap
 from pypdf import PdfReader, PdfWriter, PageObject, Transformation
 from pypdf.generic import FloatObject
 from reportlab.pdfgen import canvas
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
+pdfmetrics.registerFont(TTFont('JBLACK', './fonts/JBLACK.TTF'))
+pdfmetrics.registerFont(TTFont('OldNewsPaper', './fonts/Old Newspaper Font.ttf'))
+pdfmetrics.registerFont(TTFont('Montserrat-Regular', './fonts/Montserrat-Regular.ttf'))
 
 with open("spells.json", "r") as f:
     all_spells = json.load(f)["spells"]
@@ -59,16 +65,31 @@ for f in pdf_files:
         if char_spells:
             packet = io.BytesIO()
             c = canvas.Canvas(packet, pagesize=(612, 792))
-            c.setFont("Helvetica", 6)
-            x, y = 30, 380
+            x, y = 30, 370
+            
+            c.setFont("JBLACK", 16)
+            c.drawString(x, y, "Spells")
+            y -= 20
+            
             for spell in char_spells:
-                text = f"{spell['name']} (Tier {spell['tier']} {', '.join(spell['class'])}): {spell['description']}"
-                for line in textwrap.wrap(text, width=55):
-                    c.drawString(x, y, line)
-                    y -= 8
+                if y < 40:
+                    x += 185
+                    y = 370
+                
+                c.setFont("OldNewsPaper", 12)
+                c.drawString(x, y, spell['name'])
+                y -= 14
+                
+                c.setFont("Montserrat-Regular", 8)
+                text = f"(Tier {spell['tier']} {', '.join(spell['class'])}): {spell['description']}"
+                for line in textwrap.wrap(text, width=48):
                     if y < 30:
                         x += 185
-                        y = 380
+                        y = 370
+                    c.drawString(x, y, line)
+                    y -= 10
+                y -= 8
+                    
             c.save()
             packet.seek(0)
             
