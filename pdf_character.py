@@ -58,12 +58,10 @@ def generate_pdf(json_path, output_path):
     spells = [str(t).replace("Spell: ", "") for t in talents if str(t).startswith("Spell: ")]
     pure_talents = [t for t in talents if not str(t).startswith("Spell: ")]
 
-    if pure_talents: ts.append(f"Talents\n{', '.join(pure_talents)}\n")
-    if spells: ts.append(f"Spells\n{', '.join(spells)}\n")
-    if data.get("languages"): ts.append(f"Languages\n{', '.join(data['languages'])}\n")
-    if data.get("traits"): ts.append(f"Traits\n{', '.join(data['traits'])}\n")
-    if data.get("proficiencies"):
-        ts.append(f"Proficiencies\n{', '.join(f'{k.capitalize()}: {v}' for k, v in data['proficiencies'].items())}\n")
+    if pure_talents: ts.append(f"{', '.join(pure_talents)}\n")
+    if spells: ts.append(f"{', '.join(spells)}\n")
+    if data.get("languages"): ts.append(f"{', '.join(data['languages'])}\n")
+    if data.get("traits"): ts.append(f"{', '.join(data['traits'])}\n")
 
     gold_val = float(data.get("gold", 0))
     total_cp = int(round(gold_val * 100))
