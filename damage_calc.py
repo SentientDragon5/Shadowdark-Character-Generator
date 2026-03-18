@@ -69,13 +69,19 @@ def process_stats(paths):
             d = json.load(f)
             srcs = get_damage_sources(d, s_db, e_db)
             if not srcs: continue
-            c_e = {"name": d["name"], "class": d["class"], "all_attacks": []}
+            c_e = {"name": d["name"], "class": d["class"], "weapon_stats": {}, "all_attacks": []}
             best_s, best_v = None, -1
             for s in srcs:
+                mi_b, ma_b, av_b = get_die_stats(s.get("damage", "1d4"), d.get("level", 1))
                 curve = [{"ac": v, "min": round(r[0], 2), "max": round(r[1], 2), "mean": round(r[2], 2)} 
                          for v in tr for r in [calculate_dpr_stats(s, v, v-10)]]
                 dist = s.get("range", "C").split('/')[0]
-                a_e = {"name": s["name"], "range": dist, "curve": curve}
+                ms = [pt["mean"] for pt in curve]
+                avg_dpr, min_dpr, max_dpr = sum(ms)/len(ms), min(ms), max(ms)
+                a_stats = {"base_damage": {"min": mi_b, "max": ma_b, "mean": av_b}, 
+                           "expected_dpr": {"min": round(min_dpr, 2), "max": round(max_dpr, 2), "mean": round(avg_dpr, 2)}}
+                c_e["weapon_stats"][s["name"]] = a_stats
+                a_e = {"name": s["name"], "range": dist, "stats": a_stats, "curve": curve}
                 c_e["all_attacks"].append(a_e)
                 m15 = calculate_dpr_stats(s, ref, ref-10)[2]
                 if m15 > best_v: best_s, best_v = a_e, m15
