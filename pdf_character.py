@@ -183,6 +183,7 @@ if __name__ == "__main__":
     
     if args.all:
         for json_file in glob.glob("./output/*.json"):
+            if os.path.basename(json_file).startswith("_"): continue
             generate_pdf(json_file, json_file.replace(".json", "_Filled.pdf"))
     elif args.json_path:
         generate_pdf(args.json_path, args.json_path.replace(".json", "_Filled.pdf"))

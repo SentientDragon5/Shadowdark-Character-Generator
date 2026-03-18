@@ -64,6 +64,7 @@ def process_stats(paths):
     all_s = []
     plt.figure(figsize=(12, 7))
     for p in paths:
+        if os.path.basename(p).startswith("_"): continue
         if "damage_stats.json" in p: continue
         with open(p, 'r') as f:
             d = json.load(f)
@@ -88,14 +89,14 @@ def process_stats(paths):
             if best_s:
                 plt.plot(tr, [pt["mean"] for pt in best_s["curve"]], marker='o', label=f"{d['name']} ({best_s['range']}): {best_s['name']}")
             all_s.append(c_e)
-    with open("output/damage_stats.json", "w") as f: json.dump(all_s, f, indent=2)
+    with open("output/_damage_stats.json", "w") as f: json.dump(all_s, f, indent=2)
     plt.title("Best Attack Mean DPR per Character")
     plt.xlabel("Target AC")
     plt.ylabel("Mean Damage")
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.grid(True, ls='--', alpha=0.6)
     plt.tight_layout()
-    plt.savefig("output/damage_chart.png")
+    plt.savefig("output/_damage_chart.png")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
