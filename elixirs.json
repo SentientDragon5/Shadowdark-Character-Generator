@@ -1,0 +1,94 @@
+{
+  "elixirs": [
+    {
+      "name": "Healing Elixir",
+      "type": "Quaffed",
+      "ingredient": "Level 4+ Monster Blood",
+      "description": "Heal (1+LV)d4 hp on target. If the target is dying, they are stabilized instead of recovering health."
+    },
+    {
+      "name": "Invisibility Elixir",
+      "type": "Quaffed",
+      "ingredient": "Moss",
+      "description": "Target becomes invisible for (LV) turns unless you attack or cast a spell. If quaffed (HL) times before a short rest inflicts Poison."
+    },
+    {
+      "name": "Water Breathing Elixir",
+      "type": "Quaffed",
+      "ingredient": "Sea Flora",
+      "description": "Target no longer required to hold breath while swimming for 60 rounds (1 hour)."
+    },
+    {
+      "name": "Potion of Love",
+      "type": "Quaffed",
+      "ingredient": "Sap",
+      "description": "The first creature of level (LV) or less that the target sees, they become infatuated with and regard you well for the duration. The elixir ends if you or your allies do anything to hurt it that it notices. The target knows you charmed it after the spell ends."
+    },
+    {
+      "name": "Scaleskin Elixir",
+      "type": "Quaffed",
+      "ingredient": "Scales",
+      "description": "AC+(HL) for (LV) rounds. This effect cannot stack."
+    },
+    {
+      "name": "Swiftness Elixir",
+      "type": "Quaffed",
+      "ingredient": "Quicksilver or Gems",
+      "description": "Target gains advantage on DEX checks and may move an extra time up to close. Effect ends after (LV) rounds."
+    },
+    {
+      "name": "Shining Elixir",
+      "type": "Quaffed",
+      "ingredient": "Moss",
+      "description": "Target glows up to half near distance for 60 rounds (1 hour)."
+    },
+    {
+      "name": "Polymorph Elixir",
+      "type": "Quaffed",
+      "ingredient": "Butterfly Wings",
+      "description": "Regardless of form the target cannot cast spells, use attacks unless an attack is otherwise specified, or hold items during the effects duration of 3 rounds. Ignore blowgun restrictions. Unwilling targets can negate this effect with a DC 13 CON or WIS check immediately and every round. Roll 1d8 to select from the following: 1. Turn target into a 20 HP crocodile with 2, +3 1d8, bite ATK. 2. Turn target into a 1 HP fish with a MV of double close. Swimming rules apply on land and vice versa. 3. Turn target into a 1 HP newt. 4. Turn target into a 1 HP moth with an AC of 0 and Dodge: 1/day, an attack that would hit misses instead. 5. Turn target into a 12 HP sheep. 6. Turn target into a 25 HP bear with 2, +4 1d8, claw ATK with Crush: gain an extra damage die if both attacks hit the same target. 7. Turn target into a 35 HP, double near sized blue whale with an AC of 17 and a CON of 18. Swimming rules apply on land and vice versa - you cannot move on land. 8. Turn target into a 20 HP ochre jelly with 2, +3 1d6, tentacle ATK and Split: If cut or chopped, split into two smaller oozes (with half remaining HP). Can split up to four times. If the target is split when the effects duration ends, the target dies."
+    },
+    {
+      "name": "Cure Poison Draught",
+      "type": "Quaffed",
+      "ingredient": "Mushroom",
+      "description": "Cures Poison."
+    },
+    {
+      "name": "Poison Vial",
+      "type": "Thrown",
+      "ingredient": "Mushroom",
+      "description": "Inflicts Poison. It cannot be negated for (LV) rounds."
+    },
+    {
+      "name": "Explosive Vial",
+      "type": "Thrown",
+      "ingredient": "Sulfur or Gems",
+      "description": "Deal (HL) d4 to target and all creatures in target's close."
+    },
+    {
+      "name": "Transmutation Vial",
+      "type": "Thrown",
+      "ingredient": "Honey",
+      "description": "A half near sized portion of a target object turns to coal. On a critical success, it turns to gold. Cannot target creatures."
+    },
+    {
+      "name": "Alchemical Flame Vial",
+      "type": "Thrown",
+      "ingredient": "Oil",
+      "description": "Deal (HL) d4 damage/round (end of round) for 3 rounds."
+    },
+    {
+      "name": "Acid Vial",
+      "type": "Thrown",
+      "ingredient": "Salt",
+      "description": "Deal (HL) d4 damage and, for (HL) rounds, all attacks made against the target are made with advantage."
+    },
+    {
+      "name": "Holy Water",
+      "type": "Thrown",
+      "ingredient": "Gold or Gems",
+      "description": "Deal (LV) d6 given the target is undead. Incorporeal creatures are treated as corporeal."
+    }
+  ]
+}
