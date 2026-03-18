@@ -29,6 +29,17 @@ def wrap_text(text, font_name, font_size, max_width):
             lines.append(' '.join(current_line))
     return lines
 
+def get_fitting_font_size(text, font_name, start_size, max_width, max_height):
+    size = start_size
+    min_size = 4
+    while size > min_size:
+        lines = wrap_text(text, font_name, size, max_width)
+        total_height = len(lines) * (size + 2)
+        if total_height <= max_height:
+            return size, lines
+        size -= 0.5
+    return min_size, wrap_text(text, font_name, min_size, max_width)
+
 def generate_pdf(json_path, output_path):
     pdf_path = "ShadowDark Character Sheet Fillable.pdf"
 
@@ -56,10 +67,12 @@ def generate_pdf(json_path, output_path):
     ts = []
     talents = data.get("talents", [])
     spells = [str(t).replace("Spell: ", "") for t in talents if str(t).startswith("Spell: ")]
-    pure_talents = [t for t in talents if not str(t).startswith("Spell: ")]
+    recipes = [str(t).replace("Recipe: ", "") for t in talents if str(t).startswith("Recipe: ")]
+    pure_talents = [t for t in talents if (not str(t).startswith("Spell: ") or not str(t).startswith("Recipe: "))]
 
     if pure_talents: ts.append(f"{', '.join(pure_talents)}\n")
     if spells: ts.append(f"{', '.join(spells)}\n")
+    if recipes: ts.append(f"{', '.join(recipes)}\n")
     if data.get("languages"): ts.append(f"{', '.join(data['languages'])}\n")
     if data.get("traits"): ts.append(f"{', '.join(data['traits'])}\n")
 
@@ -120,30 +133,31 @@ def generate_pdf(json_path, output_path):
                     rect = obj["/Rect"]
                     
                     da = obj.get("/DA", "")
-                    size = 10
+                    initial_size = 10
                     if da:
                         da_str = da.get_object() if hasattr(da, "get_object") else da
                         parts = str(da_str).split()
                         if "Tf" in parts:
                             try:
-                                size = float(parts[parts.index("Tf") - 1])
+                                initial_size = float(parts[parts.index("Tf") - 1])
                             except (ValueError, IndexError):
                                 pass
                     
                     x = float(rect[0]) + 2
-                    y = float(rect[3]) - size - 2
                     max_width = float(rect[2]) - float(rect[0]) - 4
+                    max_height = float(rect[3]) - float(rect[1]) - 4
                     
-                    c.setFont(font_name, size)
+                    actual_size, wrapped_lines = get_fitting_font_size(val, font_name, initial_size, max_width, max_height)
                     
-                    wrapped_lines = wrap_text(val, font_name, size, max_width)
+                    y = float(rect[3]) - actual_size - 2
+                    c.setFont(font_name, actual_size)
+                    
                     for line in wrapped_lines:
                         c.drawString(x, y, line)
-                        y -= (size + 2)
+                        y -= (actual_size + 2)
 
     c.save()
     packet.seek(0)
-    
     overlay = PdfReader(packet).pages[0]
     page.merge_page(overlay)
     
